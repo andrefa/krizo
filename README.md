@@ -1,56 +1,50 @@
-# Krizo
+# Rocket Krizo
 
 > Um tatu cansou de cavar para baixo. A solução obviamente foi construir um jetpack e ir para cima.
 
-Vertical arcade/roguelite mobile game inspired by the feel of classic Flash vertical-climbing games and the progression loop of Motherload.
+Godot 4.7 prototype based on the original **Rocket Krizo: The Skydigger** game design, rebuilt as a 2D mobile arcade/roguelite with placeholder geometry until final assets arrive.
 
-## Current state
+## Playable now
 
-The repo is intentionally **asset-free** for now. Everything visual is placeholder geometry so gameplay can be tuned before final art lands.
+- starts with Krizo standing in his underground base
+- automatic launch/ignition through a vertical tunnel
+- hold + drag mouse/touch flight controls
+- unrestricted horizontal travel with a camera that follows sideways
+- altitude score in meters
+- altitude-driven environment transition: tunnel → sky → clouds → upper atmosphere → space
+- procedural clouds and stars
+- static obstacles plus warned moving side hazards
+- obstacle impacts are recoverable; **only falling below the camera ends the run**
+- fuel pickups and coin trails
+- original GDD boosts: **Gas, Turbo, Nitro, Plasma**
+- Nitro/Plasma **Highspeed Mode** with delayed horizontal steering and dynamic camera zoom
+- local best-altitude line shown inside the world
+- persistent coins, run count, discoveries and achievements
+- persistent garage upgrades: Tank, Thrust, Control, Efficiency
+- local cosmic-map approximation via discovered altitude regions
+- start, pause, garage, retry and game-over flows
+- strict GDScript typing for Godot 4.7 warnings-as-errors
 
-Implemented before first engine pass:
+## Controls
 
-- portrait Godot 4 project
-- hold/touch jetpack flight
-- keyboard and touch steering
-- gravity, thrust, terminal fall speed and fuel
-- camera that only climbs upward
-- procedural chunk generation
-- randomized obstacle placement
-- fuel pickups
-- coin pickups and per-run currency
-- altitude and best-altitude tracking
-- local JSON save
-- persistent coin wallet
-- permanent upgrade shop
-- tank / thrust / control / efficiency upgrades
-- retry loop
-- pause/resume
-- start screen and game-over stats
-- placeholder character animation (lean, squash, flame jitter)
-- cleanup of old generated chunks
-- central balance constants
-- strict GDScript typing compatible with warnings-as-errors
+Desktop:
 
-## Run it
-
-Target editor: **Godot 4.7**.
-
-1. Pull the latest `main`.
-2. Open `project.godot` in Godot 4.7.
-3. Let Godot reimport/upgrade project metadata if it asks.
-4. Press F5.
-
-Desktop controls:
-
-- Space / mouse hold: jetpack
-- A/D or arrows: steer
+- hold left mouse and drag: boost + steer
+- Space: boost
+- A/D or arrows: fallback steering
 - P or Esc: pause
 
 Mobile:
 
-- hold finger to boost
-- horizontal finger position steers Krizo
+- hold and drag finger: boost + steer
+
+During Nitro/Plasma Highspeed Mode, Krizo keeps accelerating upward while steering responds more slowly by design.
+
+## Run it
+
+1. Pull latest `main`.
+2. Open `project.godot` in **Godot 4.7**.
+3. Press F5.
 
 ## Structure
 
@@ -61,6 +55,7 @@ scenes/
     obstacle.tscn
     fuel_pickup.tscn
     coin_pickup.tscn
+    boost_pickup.tscn
   player/
     krizo.tscn
 scripts/
@@ -73,6 +68,7 @@ scripts/
     obstacle.gd
     fuel_pickup.gd
     coin_pickup.gd
+    boost_pickup.gd
   player/
     krizo.gd
 assets/
@@ -83,16 +79,4 @@ docs/
   GAME_DESIGN.md
 ```
 
-## First engine pass checklist
-
-1. Confirm every script parses in Godot 4.7.
-2. Tune gravity/thrust until flying feels fun.
-3. Verify touch coordinate mapping on a real phone.
-4. Tune collision shapes against the placeholder silhouette.
-5. Adjust generated obstacle density and safe routes.
-6. Verify UI anchoring across common phone ratios.
-7. Replace placeholder `Visual` with final Krizo sprites only after movement feels right.
-
-## Product rule
-
-Keep the MVP small. No backend, login, multiplayer or cloud save until the core run loop is actually fun.
+See `docs/GAME_DESIGN.md` for the mapping between the 2017 GDD and the current implementation, including intentionally deferred systems that need assets, backend infrastructure, or additional design detail.
