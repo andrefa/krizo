@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource path="res://scripts/game/game.gd" type="Script" id="1"]
 [ext_resource path="res://scenes/player/krizo.tscn" type="PackedScene" id="2"]
@@ -6,6 +6,9 @@
 [ext_resource path="res://scenes/game/obstacle.tscn" type="PackedScene" id="4"]
 [ext_resource path="res://scenes/game/fuel_pickup.tscn" type="PackedScene" id="5"]
 [ext_resource path="res://scenes/game/coin_pickup.tscn" type="PackedScene" id="6"]
+
+[sub_resource type="RectangleShape2D" id="GroundShape"]
+size = Vector2(540, 40)
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1")
@@ -26,6 +29,20 @@ color = Color(0.24,0.14,0.08,1)
 polygon = PackedVector2Array(720,-12000,638,-12000,620,-9000,644,-6000,612,-3000,630,1400,720,1400)
 color = Color(0.24,0.14,0.08,1)
 
+[node name="LaunchGround" type="StaticBody2D" parent="World"]
+position = Vector2(360,1082)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/LaunchGround"]
+shape = SubResource("GroundShape")
+
+[node name="Dirt" type="Polygon2D" parent="World/LaunchGround"]
+polygon = PackedVector2Array(-270,-20,270,-20,270,120,-270,120)
+color = Color(0.30,0.18,0.09,1)
+
+[node name="GrassLine" type="Polygon2D" parent="World/LaunchGround"]
+polygon = PackedVector2Array(-270,-20,270,-20,270,-10,-270,-10)
+color = Color(0.42,0.29,0.10,1)
+
 [node name="RunGenerator" type="Node2D" parent="World"]
 script = ExtResource("3")
 obstacle_scene = ExtResource("4")
@@ -33,7 +50,7 @@ fuel_scene = ExtResource("5")
 coin_scene = ExtResource("6")
 
 [node name="Krizo" parent="World" instance=ExtResource("2")]
-position = Vector2(360,930)
+position = Vector2(360,1014)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(360,640)
@@ -110,7 +127,7 @@ layout_mode = 2
 text = "GARAGEM / UPGRADES"
 [node name="Help" type="Label" parent="HUD/StartPanel/Panel/VBox"]
 layout_mode = 2
-text = "Hold/touch to boost • steer with touch or A/D"
+text = "Segure e arraste o mouse para voar e dirigir • touch funciona igual"
 autowrap_mode = 2
 horizontal_alignment = 1
 
