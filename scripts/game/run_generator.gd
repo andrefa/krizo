@@ -40,6 +40,7 @@ func _generate_chunk(index: int) -> void:
 		_spawn_fuel(center_x, top_y)
 
 	_spawn_coin_trail(center_x, top_y)
+	_spawn_environment_decor(center_x, top_y, altitude_m)
 
 	# GDD rarity order: Gas > Turbo > Nitro > Plasma.
 	if index >= 2 and randf() < 0.42:
@@ -94,6 +95,28 @@ func _spawn_coin_trail(center_x: float, top_y: float) -> void:
 			continue
 		coin.position = Vector2(coin_x + sin(float(i) * 0.8) * 62.0, top_y + 70.0 + float(i) * 58.0)
 		add_child(coin)
+
+func _spawn_environment_decor(center_x: float, top_y: float, altitude_m: int) -> void:
+	if altitude_m >= 1050:
+		var star_count: int = 5 + randi_range(0, 5)
+		for _i: int in range(star_count):
+			var star: Polygon2D = Polygon2D.new()
+			var radius: float = randf_range(2.0, 5.5)
+			star.polygon = PackedVector2Array(Vector2(0.0, -radius), Vector2(radius, 0.0), Vector2(0.0, radius), Vector2(-radius, 0.0))
+			star.color = Color(1.0, randf_range(0.78, 1.0), randf_range(0.72, 1.0), randf_range(0.5, 0.95))
+			star.position = Vector2(center_x + randf_range(-390.0, 390.0), top_y + randf_range(20.0, GameBalance.CHUNK_HEIGHT - 20.0))
+			star.z_index = -2
+			add_child(star)
+	elif altitude_m >= 300 and altitude_m < 800:
+		var cloud_count: int = 1 + randi_range(0, 2)
+		for _i: int in range(cloud_count):
+			var cloud: Polygon2D = Polygon2D.new()
+			cloud.polygon = PackedVector2Array(Vector2(-55,-4),Vector2(-35,-20),Vector2(-10,-15),Vector2(8,-30),Vector2(30,-18),Vector2(58,-2),Vector2(42,14),Vector2(-42,14))
+			cloud.color = Color(0.92,0.96,1.0,0.48)
+			cloud.position = Vector2(center_x + randf_range(-380.0, 380.0), top_y + randf_range(50.0, 450.0))
+			cloud.scale = Vector2(randf_range(0.8,1.7), randf_range(0.7,1.25))
+			cloud.z_index = -2
+			add_child(cloud)
 
 func _spawn_boost(center_x: float, top_y: float, difficulty: float) -> void:
 	if boost_scene == null:
