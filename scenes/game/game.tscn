@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource path="res://scripts/game/game.gd" type="Script" id="1"]
 [ext_resource path="res://scenes/player/krizo.tscn" type="PackedScene" id="2"]
@@ -6,6 +6,7 @@
 [ext_resource path="res://scenes/game/obstacle.tscn" type="PackedScene" id="4"]
 [ext_resource path="res://scenes/game/fuel_pickup.tscn" type="PackedScene" id="5"]
 [ext_resource path="res://scenes/game/coin_pickup.tscn" type="PackedScene" id="6"]
+[ext_resource path="res://scenes/game/boost_pickup.tscn" type="PackedScene" id="7"]
 
 [sub_resource type="RectangleShape2D" id="GroundShape"]
 size = Vector2(540, 40)
@@ -22,11 +23,11 @@ mouse_filter = 2
 [node name="World" type="Node2D" parent="."]
 
 [node name="LeftWall" type="Polygon2D" parent="World"]
-polygon = PackedVector2Array(0,-12000,82,-12000,100,-9000,76,-6000,108,-3000,90,1400,0,1400)
+polygon = PackedVector2Array(0,-800,82,-800,100,-200,76,420,92,1000,82,1400,0,1400)
 color = Color(0.24,0.14,0.08,1)
 
 [node name="RightWall" type="Polygon2D" parent="World"]
-polygon = PackedVector2Array(720,-12000,638,-12000,620,-9000,644,-6000,612,-3000,630,1400,720,1400)
+polygon = PackedVector2Array(720,-800,638,-800,620,-200,644,420,628,1000,638,1400,720,1400)
 color = Color(0.24,0.14,0.08,1)
 
 [node name="LaunchGround" type="StaticBody2D" parent="World"]
@@ -48,6 +49,7 @@ script = ExtResource("3")
 obstacle_scene = ExtResource("4")
 fuel_scene = ExtResource("5")
 coin_scene = ExtResource("6")
+boost_scene = ExtResource("7")
 
 [node name="Krizo" parent="World" instance=ExtResource("2")]
 position = Vector2(360,1014)
@@ -72,12 +74,30 @@ layout_mode = 2
 text = "BEST 0 m"
 [node name="Coins" type="Label" parent="HUD/Top"]
 layout_mode = 2
-text = "RUN $0"
+text = "● 0"
 [node name="Fuel" type="ProgressBar" parent="HUD/Top"]
 custom_minimum_size = Vector2(240,24)
 layout_mode = 2
 value = 100.0
 show_percentage = false
+
+[node name="Region" type="Label" parent="HUD"]
+offset_left = 210.0
+offset_top = 30.0
+offset_right = 510.0
+offset_bottom = 65.0
+theme_override_font_sizes/font_size = 20
+text = "BASE SUBTERRÂNEA"
+horizontal_alignment = 2
+
+[node name="BoostStatus" type="Label" parent="HUD"]
+offset_left = 160.0
+offset_top = 190.0
+offset_right = 560.0
+offset_bottom = 245.0
+theme_override_font_sizes/font_size = 30
+text = "HIGHSPEED MODE"
+horizontal_alignment = 1
 
 [node name="StartPanel" type="Control" parent="HUD"]
 layout_mode = 3
@@ -113,21 +133,22 @@ alignment = 1
 [node name="Title" type="Label" parent="HUD/StartPanel/Panel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 54
-text = "KRIZO"
+text = "ROCKET KRIZO"
 horizontal_alignment = 1
 [node name="Subtitle" type="Label" parent="HUD/StartPanel/Panel/VBox"]
 layout_mode = 2
-text = "Cansou de cavar. Agora é pra cima."
+text = "The Skydigger • Digging through the Universe!"
+autowrap_mode = 2
 horizontal_alignment = 1
 [node name="Play" type="Button" parent="HUD/StartPanel/Panel/VBox"]
 layout_mode = 2
-text = "VOAR"
+text = "LANÇAR"
 [node name="Shop" type="Button" parent="HUD/StartPanel/Panel/VBox"]
 layout_mode = 2
 text = "GARAGEM / UPGRADES"
 [node name="Help" type="Label" parent="HUD/StartPanel/Panel/VBox"]
 layout_mode = 2
-text = "Segure e arraste o mouse para voar e dirigir • touch funciona igual"
+text = "Segure e arraste para impulsionar e dirigir • sobreviva à queda"
 autowrap_mode = 2
 horizontal_alignment = 1
 
@@ -173,7 +194,7 @@ text = "0 m"
 horizontal_alignment = 1
 [node name="Retry" type="Button" parent="HUD/GameOver/Panel/VBox"]
 layout_mode = 2
-text = "TENTAR DE NOVO"
+text = "LANÇAR DE NOVO"
 [node name="Shop" type="Button" parent="HUD/GameOver/Panel/VBox"]
 layout_mode = 2
 text = "COMPRAR UPGRADES"
@@ -227,7 +248,7 @@ offset_bottom = -30.0
 [node name="Title" type="Label" parent="HUD/ShopPanel/Panel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
-text = "GARAGEM DO KRIZO"
+text = "BASE ESPACIAL"
 horizontal_alignment = 1
 [node name="Info" type="Label" parent="HUD/ShopPanel/Panel/VBox"]
 layout_mode = 2
