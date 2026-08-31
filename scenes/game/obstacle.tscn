@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource path="res://scripts/game/obstacle.gd" type="Script" id="1"]
+[sub_resource type="RectangleShape2D" id="Shape"]
+size = Vector2(150, 42)
+
+[node name="Obstacle" type="Area2D"]
+script = ExtResource("1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("Shape")
+
+[node name="Rock" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-78, -18, -54, -30, -10, -26, 24, -34, 72, -13, 78, 16, 45, 29, -4, 24, -52, 30)
+color = Color(0.31, 0.25, 0.22, 1)

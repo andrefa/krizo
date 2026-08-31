@@ -1,0 +1,9 @@
+# Godot 4+
+.godot/
+/export/
+*.tmp
+.DS_Store
+
+# Local editor settings
+.idea/
+.vscode/
