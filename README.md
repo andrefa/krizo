@@ -30,14 +30,16 @@ Implemented before first engine pass:
 - placeholder character animation (lean, squash, flame jitter)
 - cleanup of old generated chunks
 - central balance constants
+- strict GDScript typing compatible with warnings-as-errors
 
 ## Run it
 
-Requirements: Godot 4.3+.
+Target editor: **Godot 4.7**.
 
-1. Clone the repository.
-2. Open `project.godot`.
-3. Press F5.
+1. Pull the latest `main`.
+2. Open `project.godot` in Godot 4.7.
+3. Let Godot reimport/upgrade project metadata if it asks.
+4. Press F5.
 
 Desktop controls:
 
@@ -83,9 +85,7 @@ docs/
 
 ## First engine pass checklist
 
-The code is deliberately built as far as practical without opening Godot. The first editor session should focus on validation, not architecture:
-
-1. Confirm project parses with the installed Godot version.
+1. Confirm every script parses in Godot 4.7.
 2. Tune gravity/thrust until flying feels fun.
 3. Verify touch coordinate mapping on a real phone.
 4. Tune collision shapes against the placeholder silhouette.
