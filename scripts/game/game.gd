@@ -44,18 +44,18 @@ func _process(delta: float) -> void:
 	if not started or finished:
 		return
 
-	# Dynamic third-person camera: vertical progress remains primary, but horizontal
-	# movement is no longer constrained to the original screen width.
 	var target_y: float = minf(camera.global_position.y, krizo.global_position.y - GameBalance.CAMERA_LEAD)
 	camera.global_position.y = lerpf(camera.global_position.y, target_y, 5.0 * delta)
 	camera.global_position.x = lerpf(camera.global_position.x, krizo.global_position.x, 3.2 * delta)
-	background.position = camera.global_position - Vector2(360.0, 640.0)
+	var target_zoom: Vector2 = Vector2(0.84, 0.84) if krizo.highspeed_time_left > 0.0 else Vector2.ONE
+	camera.zoom = camera.zoom.lerp(target_zoom, 2.8 * delta)
+	background.position = camera.global_position - Vector2(360.0, 640.0) / camera.zoom
+	background.size = Vector2(720.0, 1280.0) / camera.zoom
 
 	generator.update_for_player(krizo.global_position, max_altitude)
 
-	# Per the GDD, impacts are recoverable. The run ends only if Krizo falls
-	# beyond the allowed lower edge of the camera.
-	if krizo.global_position.y > camera.global_position.y + 850.0:
+	# The original GDD defines failure only as falling beyond the allowed limit.
+	if krizo.global_position.y > camera.global_position.y + 850.0 / camera.zoom.y:
 		krizo.crash()
 
 	if boost_message_time > 0.0:
@@ -74,14 +74,10 @@ func _on_start_pressed() -> void:
 	generator.prime()
 	krizo.begin_launch()
 	region_label.text = "LANÇAMENTO"
-	boost_label.text = "IGNIÇÃO!"
-	boost_label.visible = true
-	boost_message_time = 1.4
+	_show_status("IGNIÇÃO!", 1.4)
 
 func _on_launch_finished() -> void:
-	boost_label.text = "VOCÊ ESTÁ NO CONTROLE"
-	boost_label.visible = true
-	boost_message_time = 1.5
+	_show_status("VOCÊ ESTÁ NO CONTROLE", 1.5)
 
 func _on_altitude_changed(meters: int) -> void:
 	max_altitude = maxi(max_altitude, meters)
@@ -96,15 +92,16 @@ func _on_coin_collected(total: int) -> void:
 	coin_label.text = "● %d" % total
 
 func _on_boost_activated(boost_name: String) -> void:
-	boost_label.text = boost_name.to_upper()
-	boost_label.visible = true
-	boost_message_time = 1.25
+	_show_status(boost_name.to_upper(), 1.25)
 
 func _on_highspeed_changed(active: bool) -> void:
 	if active:
-		boost_label.text = "HIGHSPEED MODE"
-		boost_label.visible = true
-		boost_message_time = 2.0
+		_show_status("HIGHSPEED MODE", 2.0)
+
+func _show_status(text: String, duration: float) -> void:
+	boost_label.text = text
+	boost_label.visible = true
+	boost_message_time = duration
 
 func _update_region(meters: int) -> void:
 	var new_region: String
@@ -121,6 +118,8 @@ func _update_region(meters: int) -> void:
 	if new_region != current_region:
 		current_region = new_region
 		region_label.text = current_region
+		if SaveManager.discover_region(current_region):
+			_show_status("DESCOBERTO: %s" % current_region, 2.0)
 
 func _update_background(meters: int) -> void:
 	var color: Color
@@ -143,7 +142,7 @@ func _on_crashed() -> void:
 		return
 	finished = true
 	SaveManager.finish_run(max_altitude, krizo.run_coins)
-	game_over_stats.text = "%d m\n+%d coins\nBest: %d m" % [max_altitude, krizo.run_coins, SaveManager.best_altitude()]
+	game_over_stats.text = "%d m\n+%d coins\nBest: %d m\n%d regiões estudadas" % [max_altitude, krizo.run_coins, SaveManager.best_altitude(), SaveManager.discovery_count()]
 	game_over.visible = true
 	_refresh_meta_ui()
 
@@ -186,8 +185,8 @@ func _refresh_meta_ui() -> void:
 	best_label.text = "BEST %d m" % SaveManager.best_altitude()
 
 func _refresh_shop() -> void:
-	shop_info.text = "COINS: %d\n\nTank Lv.%d — %d\nThrust Lv.%d — %d\nControl Lv.%d — %d\nEfficiency Lv.%d — %d" % [
-		SaveManager.coins(),
+	shop_info.text = "COINS: %d • RUNS: %d\nMAPA: %d regiões • %d achievements\n\nTank Lv.%d — %d\nThrust Lv.%d — %d\nControl Lv.%d — %d\nEfficiency Lv.%d — %d" % [
+		SaveManager.coins(), SaveManager.runs(), SaveManager.discovery_count(), SaveManager.achievement_count(),
 		SaveManager.upgrade_level("tank"), SaveManager.upgrade_cost("tank"),
 		SaveManager.upgrade_level("thrust"), SaveManager.upgrade_cost("thrust"),
 		SaveManager.upgrade_level("control"), SaveManager.upgrade_cost("control"),
