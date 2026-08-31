@@ -3,17 +3,7 @@ extends Node
 const SAVE_PATH: String = "user://krizo_save.json"
 const META_KEYS: Array[String] = ["coins", "best_altitude", "runs"]
 
-var data: Dictionary = {
-	"coins": 0,
-	"best_altitude": 0,
-	"runs": 0,
-	"upgrades": {
-		"tank": 0,
-		"thrust": 0,
-		"control": 0,
-		"efficiency": 0
-	}
-}
+var data: Dictionary = _defaults()
 
 func _ready() -> void:
 	load_save()
@@ -42,6 +32,12 @@ func finish_run(altitude: int, earned_coins: int) -> void:
 	data["coins"] = int(data.get("coins", 0)) + earned_coins
 	data["best_altitude"] = maxi(int(data.get("best_altitude", 0)), altitude)
 	data["runs"] = int(data.get("runs", 0)) + 1
+	if altitude >= 100:
+		unlock_achievement("sky_digger", false)
+	if altitude >= 700:
+		unlock_achievement("thin_air", false)
+	if altitude >= 1200:
+		unlock_achievement("space_mole", false)
 	save()
 
 func coins() -> int:
@@ -49,6 +45,9 @@ func coins() -> int:
 
 func best_altitude() -> int:
 	return int(data.get("best_altitude", 0))
+
+func runs() -> int:
+	return int(data.get("runs", 0))
 
 func upgrade_level(key: String) -> int:
 	var upgrades: Dictionary = data.get("upgrades", {}) as Dictionary
@@ -71,6 +70,33 @@ func buy_upgrade(key: String) -> bool:
 	save()
 	return true
 
+func discover_region(region: String) -> bool:
+	var discoveries: Array = data.get("discoveries", []) as Array
+	if discoveries.has(region):
+		return false
+	discoveries.append(region)
+	data["discoveries"] = discoveries
+	save()
+	return true
+
+func discovery_count() -> int:
+	var discoveries: Array = data.get("discoveries", []) as Array
+	return discoveries.size()
+
+func unlock_achievement(key: String, save_immediately: bool = true) -> bool:
+	var achievements: Array = data.get("achievements", []) as Array
+	if achievements.has(key):
+		return false
+	achievements.append(key)
+	data["achievements"] = achievements
+	if save_immediately:
+		save()
+	return true
+
+func achievement_count() -> int:
+	var achievements: Array = data.get("achievements", []) as Array
+	return achievements.size()
+
 func reset_progress() -> void:
 	data = _defaults()
 	save()
@@ -89,6 +115,12 @@ func _merge_defaults(raw: Dictionary) -> Dictionary:
 			if raw_upgrades.has(key_string):
 				merged_upgrades[key_string] = raw_upgrades[key_string]
 		merged["upgrades"] = merged_upgrades
+	var raw_discoveries: Variant = raw.get("discoveries", [])
+	if raw_discoveries is Array:
+		merged["discoveries"] = raw_discoveries
+	var raw_achievements: Variant = raw.get("achievements", [])
+	if raw_achievements is Array:
+		merged["achievements"] = raw_achievements
 	return merged
 
 func _defaults() -> Dictionary:
@@ -96,5 +128,7 @@ func _defaults() -> Dictionary:
 		"coins": 0,
 		"best_altitude": 0,
 		"runs": 0,
-		"upgrades": {"tank": 0, "thrust": 0, "control": 0, "efficiency": 0}
+		"upgrades": {"tank": 0, "thrust": 0, "control": 0, "efficiency": 0},
+		"discoveries": [],
+		"achievements": []
 	}
