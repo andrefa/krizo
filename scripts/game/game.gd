@@ -22,6 +22,7 @@ var finished: bool = false
 var max_altitude: int = 0
 var current_region: String = "BASE SUBTERRÂNEA"
 var boost_message_time: float = 0.0
+var best_marker: Node2D
 
 func _ready() -> void:
 	krizo.process_mode = Node.PROCESS_MODE_DISABLED
@@ -39,6 +40,7 @@ func _ready() -> void:
 	region_label.text = current_region
 	_refresh_meta_ui()
 	_update_background(0)
+	_create_best_marker()
 
 func _process(delta: float) -> void:
 	if not started or finished:
@@ -52,6 +54,9 @@ func _process(delta: float) -> void:
 	background.position = camera.global_position - Vector2(360.0, 640.0) / camera.zoom
 	background.size = Vector2(720.0, 1280.0) / camera.zoom
 
+	if best_marker != null:
+		best_marker.position.x = krizo.global_position.x
+
 	generator.update_for_player(krizo.global_position, max_altitude)
 
 	# The original GDD defines failure only as falling beyond the allowed limit.
@@ -62,6 +67,28 @@ func _process(delta: float) -> void:
 		boost_message_time = maxf(0.0, boost_message_time - delta)
 		if boost_message_time <= 0.0:
 			boost_label.visible = false
+
+func _create_best_marker() -> void:
+	var saved_best: int = SaveManager.best_altitude()
+	if saved_best <= 0:
+		return
+	best_marker = Node2D.new()
+	best_marker.name = "BestMarker"
+	best_marker.position = Vector2(krizo.global_position.x, krizo.start_y - float(saved_best) * GameBalance.PIXELS_PER_METER)
+	best_marker.z_index = -1
+	$World.add_child(best_marker)
+
+	var line: Line2D = Line2D.new()
+	line.width = 3.0
+	line.default_color = Color(1.0, 0.78, 0.22, 0.72)
+	line.points = PackedVector2Array(Vector2(-330.0, 0.0), Vector2(330.0, 0.0))
+	best_marker.add_child(line)
+
+	var marker_label: Label = Label.new()
+	marker_label.position = Vector2(-105.0, -36.0)
+	marker_label.text = "SEU RECORDE • %d m" % saved_best
+	marker_label.add_theme_font_size_override("font_size", 18)
+	best_marker.add_child(marker_label)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause") and started and not finished:
