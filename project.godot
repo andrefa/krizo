@@ -1,12 +1,12 @@
 ; Engine configuration file.
-; Godot 4.x project
+; Godot 4.7 project
 
 config_version=5
 
 [application]
 config/name="Krizo"
 run/main_scene="res://scenes/game/game.tscn"
-config/features=PackedStringArray("4.3")
+config/features=PackedStringArray("4.7")
 
 [autoload]
 SaveManager="*res://scripts/core/save_manager.gd"
