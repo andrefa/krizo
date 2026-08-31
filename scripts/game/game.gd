@@ -1,7 +1,7 @@
 extends Node2D
 
-@onready var krizo: CharacterBody2D = $World/Krizo
-@onready var generator: Node2D = $World/RunGenerator
+@onready var krizo: KrizoPlayer = $World/Krizo as KrizoPlayer
+@onready var generator: RunGenerator = $World/RunGenerator as RunGenerator
 @onready var camera: Camera2D = $Camera2D
 @onready var altitude_label: Label = $HUD/Top/Altitude
 @onready var best_label: Label = $HUD/Top/Best
@@ -14,9 +14,9 @@ extends Node2D
 @onready var shop_panel: Control = $HUD/ShopPanel
 @onready var shop_info: Label = $HUD/ShopPanel/Panel/VBox/Info
 
-var started := false
-var finished := false
-var max_altitude := 0
+var started: bool = false
+var finished: bool = false
+var max_altitude: int = 0
 
 func _ready() -> void:
 	krizo.process_mode = Node.PROCESS_MODE_DISABLED
@@ -32,8 +32,8 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if not started or finished:
 		return
-	var target_y := min(camera.global_position.y, krizo.global_position.y - GameBalance.CAMERA_LEAD)
-	camera.global_position.y = lerp(camera.global_position.y, target_y, 5.0 * delta)
+	var target_y: float = minf(camera.global_position.y, krizo.global_position.y - GameBalance.CAMERA_LEAD)
+	camera.global_position.y = lerpf(camera.global_position.y, target_y, 5.0 * delta)
 	generator.update_for_player(krizo.global_position.y, max_altitude)
 	if krizo.global_position.y > camera.global_position.y + 850.0:
 		krizo.crash()
@@ -49,7 +49,7 @@ func _on_start_pressed() -> void:
 	generator.prime()
 
 func _on_altitude_changed(meters: int) -> void:
-	max_altitude = max(max_altitude, meters)
+	max_altitude = maxi(max_altitude, meters)
 	altitude_label.text = "%04d m" % meters
 
 func _on_fuel_changed(ratio: float) -> void:
@@ -63,7 +63,7 @@ func _on_crashed() -> void:
 		return
 	finished = true
 	SaveManager.finish_run(max_altitude, krizo.run_coins)
-	game_over_stats.text = "%d m\n+%d coins\nBest: %d m" % [max_altitude, krizo.run_coins, int(SaveManager.data.best_altitude)]
+	game_over_stats.text = "%d m\n+%d coins\nBest: %d m" % [max_altitude, krizo.run_coins, SaveManager.best_altitude()]
 	game_over.visible = true
 	_refresh_meta_ui()
 
@@ -90,17 +90,24 @@ func _buy_upgrade(key: String) -> void:
 	_refresh_meta_ui()
 	_refresh_shop()
 
-func _on_tank_pressed() -> void: _buy_upgrade("tank")
-func _on_thrust_pressed() -> void: _buy_upgrade("thrust")
-func _on_control_pressed() -> void: _buy_upgrade("control")
-func _on_efficiency_pressed() -> void: _buy_upgrade("efficiency")
+func _on_tank_pressed() -> void:
+	_buy_upgrade("tank")
+
+func _on_thrust_pressed() -> void:
+	_buy_upgrade("thrust")
+
+func _on_control_pressed() -> void:
+	_buy_upgrade("control")
+
+func _on_efficiency_pressed() -> void:
+	_buy_upgrade("efficiency")
 
 func _refresh_meta_ui() -> void:
-	best_label.text = "BEST %d m" % int(SaveManager.data.best_altitude)
+	best_label.text = "BEST %d m" % SaveManager.best_altitude()
 
 func _refresh_shop() -> void:
 	shop_info.text = "COINS: %d\n\nTank Lv.%d — %d\nThrust Lv.%d — %d\nControl Lv.%d — %d\nEfficiency Lv.%d — %d" % [
-		int(SaveManager.data.coins),
+		SaveManager.coins(),
 		SaveManager.upgrade_level("tank"), SaveManager.upgrade_cost("tank"),
 		SaveManager.upgrade_level("thrust"), SaveManager.upgrade_cost("thrust"),
 		SaveManager.upgrade_level("control"), SaveManager.upgrade_cost("control"),
