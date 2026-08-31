@@ -2,31 +2,53 @@
 
 > Um tatu cansou de cavar para baixo. A solução obviamente foi construir um jetpack e ir para cima.
 
-Prototype of a vertical arcade/roguelite mobile game inspired by the feel of classic Flash vertical-climbing games and the progression loop of Motherload.
+Vertical arcade/roguelite mobile game inspired by the feel of classic Flash vertical-climbing games and the progression loop of Motherload.
 
-## Current prototype
+## Current state
 
-This first commit intentionally uses **code-drawn placeholder assets**. No final art is included yet.
+The repo is intentionally **asset-free** for now. Everything visual is placeholder geometry so gameplay can be tuned before final art lands.
 
-Already playable:
+Implemented before first engine pass:
 
-- hold mouse / touch / Space to fire the jetpack
-- A/D or arrows to steer on desktop
-- gravity, thrust and fuel consumption
-- gentle fuel recharge while not boosting
-- upward-only camera tracking
-- altitude counter
-- fuel HUD
-- collision with rocks and retry flow
+- portrait Godot 4 project
+- hold/touch jetpack flight
+- keyboard and touch steering
+- gravity, thrust, terminal fall speed and fuel
+- camera that only climbs upward
+- procedural chunk generation
+- randomized obstacle placement
 - fuel pickups
-- simple squash/tilt/flame animation from code
-- portrait mobile viewport (720×1280)
+- coin pickups and per-run currency
+- altitude and best-altitude tracking
+- local JSON save
+- persistent coin wallet
+- permanent upgrade shop
+- tank / thrust / control / efficiency upgrades
+- retry loop
+- pause/resume
+- start screen and game-over stats
+- placeholder character animation (lean, squash, flame jitter)
+- cleanup of old generated chunks
+- central balance constants
 
-## Requirements
+## Run it
 
-- Godot 4.3+ recommended
+Requirements: Godot 4.3+.
 
-Open `project.godot` and press **F6/F5**.
+1. Clone the repository.
+2. Open `project.godot`.
+3. Press F5.
+
+Desktop controls:
+
+- Space / mouse hold: jetpack
+- A/D or arrows: steer
+- P or Esc: pause
+
+Mobile:
+
+- hold finger to boost
+- horizontal finger position steers Krizo
 
 ## Structure
 
@@ -36,34 +58,41 @@ scenes/
     game.tscn
     obstacle.tscn
     fuel_pickup.tscn
+    coin_pickup.tscn
   player/
     krizo.tscn
 scripts/
+  core/
+    game_balance.gd
+    save_manager.gd
   game/
     game.gd
+    run_generator.gd
     obstacle.gd
     fuel_pickup.gd
+    coin_pickup.gd
   player/
     krizo.gd
 assets/
-  art/        # final character/environment art later
-  audio/      # music + SFX later
+  art/
+  audio/
   fonts/
+docs/
+  GAME_DESIGN.md
 ```
 
-## Design direction
+## First engine pass checklist
 
-The MVP should stay brutally small:
+The code is deliberately built as far as practical without opening Godot. The first editor session should focus on validation, not architecture:
 
-1. Make flying feel good.
-2. Build an interesting vertical route.
-3. Add collectible resources.
-4. Add a basic between-runs upgrade loop.
-5. Replace placeholders with Krizo's final art.
-6. Add mobile polish, sound and monetization only after the core loop is fun.
+1. Confirm project parses with the installed Godot version.
+2. Tune gravity/thrust until flying feels fun.
+3. Verify touch coordinate mapping on a real phone.
+4. Tune collision shapes against the placeholder silhouette.
+5. Adjust generated obstacle density and safe routes.
+6. Verify UI anchoring across common phone ratios.
+7. Replace placeholder `Visual` with final Krizo sprites only after movement feels right.
 
-## Placeholder philosophy
+## Product rule
 
-The current Krizo is deliberately made from `Polygon2D` nodes instead of temporary copyrighted art. This lets us tune silhouette, collision, scale, animation and camera behavior before committing to sprites.
-
-When final sprites arrive, the `Visual` node inside `scenes/player/krizo.tscn` can be replaced by `AnimatedSprite2D` without changing the movement code.
+Keep the MVP small. No backend, login, multiplayer or cloud save until the core run loop is actually fun.

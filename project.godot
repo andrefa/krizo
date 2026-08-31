@@ -8,6 +8,9 @@ config/name="Krizo"
 run/main_scene="res://scenes/game/game.tscn"
 config/features=PackedStringArray("4.3")
 
+[autoload]
+SaveManager="*res://scripts/core/save_manager.gd"
+
 [display]
 window/size/viewport_width=720
 window/size/viewport_height=1280
@@ -33,4 +36,8 @@ move_left={
 move_right={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"physical_keycode":68), Object(InputEventKey,"physical_keycode":4194313)]
+}
+pause={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"physical_keycode":4194305), Object(InputEventKey,"physical_keycode":80)]
 }
