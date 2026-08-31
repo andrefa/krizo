@@ -3,7 +3,6 @@ class_name ObstacleHazard
 
 var motion_velocity: Vector2 = Vector2.ZERO
 var warning_time: float = 0.0
-var warning_total: float = 0.0
 var activated: bool = true
 
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
@@ -18,7 +17,6 @@ func _ready() -> void:
 func configure_motion(velocity: Vector2, delay: float) -> void:
 	motion_velocity = velocity
 	warning_time = maxf(0.0, delay)
-	warning_total = warning_time
 
 func configure_tint(color: Color) -> void:
 	modulate = color
