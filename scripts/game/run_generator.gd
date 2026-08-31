@@ -26,17 +26,15 @@ func _generate_chunk(index: int) -> void:
 	var difficulty: float = GameBalance.difficulty_for_altitude(altitude_m)
 	var center_x: float = generation_center_x
 
-	# The first meters are the launch corridor described in the original GDD.
+	# First ~90 m: deterministic launch corridor. Above it the run opens up.
 	if index >= 2:
 		var obstacle_count: int = 2 + int(roundf(difficulty * 3.0))
 		for _i: int in range(obstacle_count):
-			var obstacle: Node2D = obstacle_scene.instantiate() as Node2D
-			if obstacle == null:
-				continue
-			obstacle.position = Vector2(center_x + randf_range(-255.0, 255.0), top_y + randf_range(80.0, GameBalance.CHUNK_HEIGHT - 60.0))
-			obstacle.rotation = randf_range(-0.45, 0.45)
-			obstacle.scale = Vector2(randf_range(0.75, 1.35), randf_range(0.85, 1.2))
-			add_child(obstacle)
+			_spawn_static_obstacle(center_x, top_y, altitude_m)
+
+		# At higher difficulty some hazards announce themselves, then cross the screen.
+		if difficulty > 0.28 and randf() < 0.20 + difficulty * 0.28:
+			_spawn_side_hazard(center_x, top_y, altitude_m, difficulty)
 
 	if index % 2 == 0:
 		_spawn_fuel(center_x, top_y)
@@ -49,6 +47,37 @@ func _generate_chunk(index: int) -> void:
 
 	generated_until = index + 1
 	next_chunk_y = top_y
+
+func _spawn_static_obstacle(center_x: float, top_y: float, altitude_m: int) -> void:
+	var obstacle: ObstacleHazard = obstacle_scene.instantiate() as ObstacleHazard
+	if obstacle == null:
+		return
+	obstacle.position = Vector2(center_x + randf_range(-255.0, 255.0), top_y + randf_range(80.0, GameBalance.CHUNK_HEIGHT - 60.0))
+	obstacle.rotation = randf_range(-0.45, 0.45)
+	obstacle.scale = Vector2(randf_range(0.75, 1.35), randf_range(0.85, 1.2))
+	obstacle.configure_tint(_obstacle_tint(altitude_m))
+	add_child(obstacle)
+
+func _spawn_side_hazard(center_x: float, top_y: float, altitude_m: int, difficulty: float) -> void:
+	var obstacle: ObstacleHazard = obstacle_scene.instantiate() as ObstacleHazard
+	if obstacle == null:
+		return
+	var from_left: bool = randf() < 0.5
+	var side: float = -1.0 if from_left else 1.0
+	obstacle.position = Vector2(center_x + side * 420.0, top_y + randf_range(150.0, 370.0))
+	var speed: float = 170.0 + difficulty * 190.0
+	obstacle.configure_motion(Vector2(-side * speed, randf_range(-20.0, 30.0)), 0.9)
+	obstacle.configure_tint(_obstacle_tint(altitude_m).lightened(0.16))
+	add_child(obstacle)
+
+func _obstacle_tint(altitude_m: int) -> Color:
+	if altitude_m < 350:
+		return Color("d1aa83")
+	if altitude_m < 700:
+		return Color("d9e6ea")
+	if altitude_m < 1200:
+		return Color("9aa8c7")
+	return Color("8e7aa8")
 
 func _spawn_fuel(center_x: float, top_y: float) -> void:
 	var fuel: Node2D = fuel_scene.instantiate() as Node2D
