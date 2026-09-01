@@ -59,7 +59,6 @@ func _process(delta: float) -> void:
 
 	generator.update_for_player(krizo.global_position, max_altitude)
 
-	# The original GDD defines failure only as falling beyond the allowed limit.
 	if krizo.global_position.y > camera.global_position.y + 850.0 / camera.zoom.y:
 		krizo.crash()
 
@@ -81,7 +80,7 @@ func _create_best_marker() -> void:
 	var line: Line2D = Line2D.new()
 	line.width = 3.0
 	line.default_color = Color(1.0, 0.78, 0.22, 0.72)
-	line.points = PackedVector2Array(Vector2(-330.0, 0.0), Vector2(330.0, 0.0))
+	line.points = PackedVector2Array([Vector2(-330.0, 0.0), Vector2(330.0, 0.0)])
 	best_marker.add_child(line)
 
 	var marker_label: Label = Label.new()
